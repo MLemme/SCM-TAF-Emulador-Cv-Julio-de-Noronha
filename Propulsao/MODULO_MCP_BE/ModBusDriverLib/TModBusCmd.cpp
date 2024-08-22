@@ -1,0 +1,706 @@
+
+/*
+ *  CLASSE COMANDO MODBUS - TModBusCmd
+ *
+ *  - Implementa um conteiner para os buffers de comandos
+ *    ModBus que são enviados pela rede
+ *
+ *  Features:
+ *
+ *  >
+ *
+ *
+ */
+
+#ifndef __TMODBUSCMD_CPP
+#define __TMODBUSCMD_CPP
+
+
+#ifndef __VECTOR_H
+#include <vector.h>
+#endif
+
+
+class TModBusCmd
+{
+
+public:
+
+   TModBusCmd();
+   TModBusCmd( TModBusCmd* outro );
+
+   ~TModBusCmd();
+
+
+   void Clear();
+
+   bool fc01 ( int _end,                     int  _qtd, unsigned char _slaveAddr );  // Read Coil Status
+   bool fc02 ( int _end,                     int  _qtd, unsigned char _slaveAddr );  // Read Input Status
+   bool fc03 ( int _end,                     int  _qtd, unsigned char _slaveAddr );  // Read Holding Registers
+   bool fc04 ( int _end,                     int  _qtd, unsigned char _slaveAddr );  // Read Input Registers
+   bool fc05 ( int _end,                     bool _val, unsigned char _slaveAddr );  // Force Single Coil
+   bool fc06 ( int _end,               short int  _val, unsigned char _slaveAddr );  // Preset Single Register
+
+   bool fc15 ( int _end, int _qtd,          bool *vals, unsigned char _slaveAddr );  // Force Multiple Coils
+   bool fc16 ( int _end, int _qtd,    short int  *vals, unsigned char _slaveAddr );  // Preset Multiple Registers ( words 16 bits )
+   bool fc16 ( int _end,                    float _val, unsigned char _slaveAddr );  // Preset Multiple Registers ( float 32 bits )
+
+   bool fc22 ( int _end, short int _and, short int _or, unsigned char _slaveAddr );  // Mask Write Register
+
+
+   void SetTransactionId( unsigned short int _id );       // Altera o Transaction Id do Comando que por padrão seria 'end'
+
+   bool ParseResponse( byteBuffStruct *resp );            // Versão byteBuffStruct
+   bool ParseResponse( unsigned char *buffer, int tam );  // Testa a validade de uma resposta a esse comando armazenado
+
+
+//   AnsiString PrintBuffer();      // Imprime ambos os Buffers
+   AnsiString PrintModBusCmd();   // Imprime o Buffer de Comando
+   AnsiString PrintModBusResp();  // Imprime o Buffer da Resposta
+
+
+   AnsiString
+      erro;       // Caso haja um erro, ele será detalhado aqui
+
+   unsigned char
+      fc,         // Function Code desse Comando
+      slaveAddr;  // Slave Address (praticamente sempre 1)
+
+   unsigned short int
+      id,         // Transaction Id desse Comando
+      end,        // Endereço da área de memória remota a ser acessado
+      qtd;        // Quantidade de dados escritos ou requisitados
+
+
+   vector< bool >
+      b_returnVals;
+
+   vector< short int >
+      i_returnVals;
+
+
+   byteBuffStruct
+     *cmd,
+     *resp;
+
+
+private:
+   bool fcGEN( int _end, short int _qtd, unsigned char _slaveAddr );  // Estrutura Genérica para vários comandos ModBus
+};
+
+
+TModBusCmd::TModBusCmd()
+{
+   cmd  = NULL;
+   resp = NULL;
+
+   Clear();
+}
+
+
+TModBusCmd::TModBusCmd( TModBusCmd* outro )
+{
+   erro      = outro->erro;
+
+   fc        = outro->fc;
+   slaveAddr = outro->slaveAddr;
+
+   id        = outro->id;
+   end       = outro->end;
+   qtd       = outro->qtd;
+
+
+   b_returnVals = outro->b_returnVals;
+   i_returnVals = outro->i_returnVals;
+
+
+   cmd  = NULL;
+   if ( outro->cmd )
+      cmd = new byteBuffStruct( outro->cmd );
+
+   resp = NULL;
+   if ( outro->resp )
+      resp = new byteBuffStruct( outro->resp );
+}
+
+
+TModBusCmd::~TModBusCmd()
+{
+   Clear();
+}
+
+
+void TModBusCmd::Clear()
+{
+   id = 0;
+   fc = 0;
+   slaveAddr = 1;
+
+   end = 0;
+   qtd = 0;
+
+
+   b_returnVals.clear();
+   i_returnVals.clear();
+
+
+   if ( cmd )
+   {
+      delete cmd;
+      cmd = NULL;
+   }
+
+   if ( resp )
+   {
+      delete resp;
+      resp = NULL;
+   }
+}
+
+
+bool TModBusCmd::fcGEN( int _end, short int _qtd_val, unsigned char _slaveAddr = 0 )  // Estrutura Genérica para vários comandos ModBus
+{
+   end = _end;
+   id  = _end;
+
+   if ( _slaveAddr )
+     slaveAddr = _slaveAddr;
+
+
+  if ( cmd = new byteBuffStruct( 12 ) )
+   {
+      unsigned short int hdrBytes = cmd->tam - 6;
+
+      writeToMemAddr( & cmd->buf[0],  toggleEndianess( id ) );        // Transaction ID (end)
+    /*writeToMemAddr( & cmd->buf[2],  0x0000 );*/                     // Protocol ID (0x0000) (Já é zero, memset para 0)
+      writeToMemAddr( & cmd->buf[4],  toggleEndianess( hdrBytes ) );  // Length (0x0006)
+                        cmd->buf[6] = slaveAddr;                      // Slave Address
+                        cmd->buf[7] = fc;                             // Function Code
+      writeToMemAddr( & cmd->buf[8],  toggleEndianess( end ) );       // Endereço
+      writeToMemAddr( & cmd->buf[10], toggleEndianess( _qtd_val ) );  // Qtd ou Valor (fc05)
+   }
+   else
+      Clear();
+
+
+   return ( cmd != NULL );
+}
+
+
+bool TModBusCmd::fc01 ( int _end, int  _qtd, unsigned char _slaveAddr = 1 )  // Read Coil Status
+{
+   Clear();
+
+   fc  = 0x01;
+   qtd = _qtd;
+
+   return fcGEN( _end, _qtd, _slaveAddr );
+}
+
+
+bool TModBusCmd::fc02 ( int _end, int  _qtd, unsigned char _slaveAddr = 1 )  // Read Input Status
+{
+   Clear();
+
+   fc  = 0x02;
+   qtd = _qtd;
+
+   return fcGEN( _end, _qtd, _slaveAddr );
+}
+
+
+bool TModBusCmd::fc03 ( int _end, int  _qtd, unsigned char _slaveAddr = 1 )  // Read Holding Registers
+{
+   Clear();
+
+   fc  = 0x03;
+   qtd = _qtd;
+
+   return fcGEN( _end, _qtd, _slaveAddr );
+}
+
+
+bool TModBusCmd::fc04 ( int _end, int  _qtd, unsigned char _slaveAddr = 1 )  // Read Input Registers
+{
+   Clear();
+
+   fc  = 0x04;
+   qtd = _qtd;
+
+   return fcGEN( _end, _qtd, _slaveAddr );
+}
+
+
+bool TModBusCmd::fc05 ( int _end, bool _val, unsigned char _slaveAddr = 1 )  // Force Single Coil
+{
+   Clear();
+
+   fc  = 0x05;
+   qtd = 1;
+
+   return fcGEN( _end, (_val ? 0xFF00 : 0), _slaveAddr );
+}
+
+
+bool TModBusCmd::fc06 ( int _end, short int _val, unsigned char _slaveAddr = 1 )  // Preset Single Register
+{
+   Clear();
+
+   fc  = 0x06;
+   qtd = 1;
+
+   return fcGEN( _end, _val, _slaveAddr );
+}
+
+
+bool TModBusCmd::fc15 ( int _end, int _qtd, bool *_vals, unsigned char _slaveAddr = 1 )  // Force Multiple Coils
+{
+   Clear();
+
+   id  = _end;
+   fc  = 0x0F;
+   end = _end;
+   qtd = _qtd;
+
+
+   if ( _slaveAddr )
+     slaveAddr = _slaveAddr;
+
+
+   if ( cmd = new byteBuffStruct( 12 + 1 + ( ( qtd - 1 ) / 8 ) ) )
+   {
+      unsigned short int hdrBytes = cmd->tam - 6;
+
+      writeToMemAddr( & cmd->buf[0],  toggleEndianess( id ) );        // Transaction ID (end)
+    /*writeToMemAddr( & cmd->buf[2],  0x0000 );*/                     // Protocol ID (0x0000) (Já é zero, memset para 0)
+      writeToMemAddr( & cmd->buf[4],  toggleEndianess( hdrBytes ) );  // Length (0x0006)
+                        cmd->buf[6] = slaveAddr;                      // Slave Address
+                        cmd->buf[7] = fc;                             // Function Code
+      writeToMemAddr( & cmd->buf[8],  toggleEndianess( end ) );       // Endereço
+      writeToMemAddr( & cmd->buf[10], toggleEndianess( qtd ) );       // Qtd
+                        cmd->buf[12] = ( qtd - 1 ) / 8;               // Bytes de Dados sendo enviados
+
+      for ( int i = 0; i < qtd; i++ )
+         cmd->buf[ 13 + i / 8 ] = ( _vals[i] ) ? SET_BIT( cmd->buf[ 13 + i / 8 ], i % 8 )
+                                               : CLR_BIT( cmd->buf[ 13 + i / 8 ], i % 8 );
+
+//      delete[] _vals;
+   }
+   else
+      Clear();
+
+
+   return ( cmd != NULL );
+}
+
+
+bool TModBusCmd::fc16 ( int _end, int _qtd, short int *_vals, unsigned char _slaveAddr = 1 )  // Preset Multiple Registers ( words 16 bits )
+{
+   Clear();
+
+   id  = _end;
+   fc  = 0x10;
+   end = _end;
+   qtd = _qtd;
+
+
+   if ( _slaveAddr )
+     slaveAddr = _slaveAddr;
+
+
+   if ( cmd = new byteBuffStruct( 12 + 1 + ( qtd * 2 ) ) )
+   {
+      unsigned short int hdrBytes = cmd->tam - 6;
+
+      writeToMemAddr( & cmd->buf[0],  toggleEndianess( id ) );        // Transaction ID (end)
+    /*writeToMemAddr( & cmd->buf[2],  0x0000 );*/                     // Protocol ID (0x0000) (Já é zero, memset para 0)
+      writeToMemAddr( & cmd->buf[4],  toggleEndianess( hdrBytes ) );  // Length (0x0006)
+                        cmd->buf[6] = slaveAddr;                      // Slave Address
+                        cmd->buf[7] = fc;                             // Function Code
+      writeToMemAddr( & cmd->buf[8],  toggleEndianess( end ) );       // Endereço
+      writeToMemAddr( & cmd->buf[10], toggleEndianess( qtd ) );       // Qtd
+                        cmd->buf[12] = qtd * 2;                       // Bytes de Dados
+
+      for ( int i = 0; i < qtd; i++ )
+         writeToMemAddr( & cmd->buf[ 13 + i*2 ], _vals[i] );
+
+//      delete[] _vals;
+   }
+   else
+      Clear();
+
+
+   return ( cmd != NULL );
+}
+
+
+bool TModBusCmd::fc16 ( int end, float val, unsigned char slaveAddr = 1 )  // Preset Multiple Registers ( float 32 bits )
+{
+   int temp = toggleEndianess( readMemAs <int> ( & val ) );  // Operações bitwise não são permitidas com floats, então lê como int
+
+   return fc16( end, 2, (short int*) & temp, slaveAddr );
+}
+
+
+bool TModBusCmd::fc22 ( int _end, short int _and, short int _or, unsigned char _slaveAddr = 1 )  // Mask Write Register
+{
+  /*
+   *  Função usada para SET ou RESET de bits individuais de um holding register
+   *
+   *  register = (ATUAL & and) | (or & ! and)
+   *
+   *  > Se  or == 0, register = ATUAL & and
+   *  > Se and == 0, register = ATUAL |  or
+   *
+   *  > Para SET o bit 'b', or  =  (0x01 << b)
+   *  > Para CLR o bit 'b', and = ~(0x01 << b)
+   *
+   */
+
+   Clear();
+
+   id  = _end;
+   fc  = 0x16;
+   end = _end;
+   qtd = 2;
+
+
+   if ( _slaveAddr )
+     slaveAddr = _slaveAddr;
+
+
+   if ( cmd = new byteBuffStruct( 14 ) )
+   {
+      unsigned short int hdrBytes = cmd->tam - 6;
+
+      writeToMemAddr( & cmd->buf[0],  toggleEndianess( id ) );        // Transaction ID (end)
+    /*writeToMemAddr( & cmd->buf[2],  0x0000 );*/                     // Protocol ID (0x0000) (Já é zero, memset para 0)
+      writeToMemAddr( & cmd->buf[4],  toggleEndianess( hdrBytes ) );  // Length (0x0006)
+                        cmd->buf[6] = slaveAddr;                      // Slave Address
+                        cmd->buf[7] = fc;                             // Function Code
+      writeToMemAddr( & cmd->buf[8],  toggleEndianess( end ) );       // Endereço
+      writeToMemAddr( & cmd->buf[10], toggleEndianess( _and ) );      // Máscara AND
+      writeToMemAddr( & cmd->buf[12], toggleEndianess( _or ) );       // Máscara OR
+   }
+   else
+      Clear();
+
+
+   return ( cmd != NULL );
+}
+
+
+void TModBusCmd::SetTransactionId( unsigned short int _id )
+{
+   if ( cmd )
+   {
+      id = _id;
+      writeToMemAddr( cmd->buf, toggleEndianess( _id ) );
+   }
+}
+
+
+bool TModBusCmd::ParseResponse( byteBuffStruct *in )  // Versão byteBuffStruct
+{
+   return ParseResponse( in->buf, in->tam );
+}
+
+
+bool TModBusCmd::ParseResponse( unsigned char *_buf, int _tam )  // Analiza um buffer de resposta a um comando para determinar se é uma resposta válida
+{
+   bool returnFlag = false;
+
+
+   if (   _buf        &&  // Garante que pode ler o buffer passado
+        ( _tam > 7 )  &&  // Garante que pode ler os 7 primeiros Bytes do Header ModBus TCP
+        ( _tam == toggleEndianess( readMemAs <unsigned short int> ( & _buf[4] ) ) + 6 ) )  // Se o tamanho informado no header condisser com o tamanho do buffer passado
+   {
+      // A partir daqui sabe que pode tentar ler qualquer coisa dentro do buffer
+
+      unsigned char
+         _fc = _buf[7];
+
+      unsigned short
+         _id = toggleEndianess( readMemAs <unsigned short int> ( _buf ) );
+
+
+      if ( ( id == _id ) &&
+           ( fc == _fc ) )   // Se a resposta tem o mesmo id e function code, assume que é a resposta a esse comando
+      {
+         if ( ! resp )  // Se ainda não recebeu uma resposta
+         {
+            returnFlag = true;
+
+            resp = new byteBuffStruct( _buf, _tam );  // Salva o Buffer recebido
+
+
+            // Se recebeu uma resposta com dados, os salva
+
+            if ( ( _fc == 0x01 ) || ( _fc == 0x02 ) )  // Respostas a comandos de 'Read Coil Status' ou 'Read Input Status'
+            {
+               for ( int i = 0; i < qtd; i++ )
+                  b_returnVals.push_back( GET_BIT( resp->buf[ 9 + i / 8 ], i % 8 ) );
+            }
+
+            else if ( ( fc == 0x03 ) || ( fc == 0x04 ) )  // Respostas a comandos de 'Read Holding Registers' ou 'Read Input Registers'
+            {
+               for ( int i = 0; i < qtd; i++ )
+                  i_returnVals.push_back( toggleEndianess( readMemAs <short int> ( & resp->buf[ 9 + i*2 ] ) ) );
+            }
+         }
+      }
+   }
+
+   return returnFlag;
+}
+
+
+AnsiString TModBusCmd::PrintModBusCmd()
+{
+   unsigned char fc = 0;
+
+   AnsiString retorno = "";
+
+   if ( cmd )
+   {
+      retorno  = "<--";
+
+      fc = cmd->buf[7];
+
+      retorno += " " + IntToHex( toggleEndianess( readMemAs <unsigned short int> ( & cmd->buf[0]  ) ), 4 );  // Transaction ID
+      retorno += " " + IntToHex( toggleEndianess( readMemAs <unsigned short int> ( & cmd->buf[2]  ) ), 4 );  // Protocol ID (0x0000)
+      retorno += " " + IntToHex( toggleEndianess( readMemAs <unsigned short int> ( & cmd->buf[4]  ) ), 4 );  // Length (0x0006)
+      retorno += " " + IntToHex( cmd->buf[6], 2 );                                                           // Slave Address
+      retorno += " " + IntToHex( cmd->buf[7], 2 );                                                           // Function Code
+      retorno += " " + IntToHex( toggleEndianess( readMemAs <unsigned short int> ( & cmd->buf[8]  ) ), 4 );  // Endereço
+      retorno += " " + IntToHex( toggleEndianess( readMemAs <unsigned short int> ( & cmd->buf[10] ) ), 4 );  // Qtd ou Valor ou Máscara AND
+
+
+           if ( fc == 0x0F )
+      {
+         retorno += " " + IntToHex( cmd->buf[12], 2 );
+
+         for ( unsigned char i = 0; i < cmd->buf[12]; i++ )
+            retorno += " " + IntToHex( cmd->buf[13 + i], 2 );
+      }
+
+      else if ( fc == 0x10 )
+      {
+         retorno += " " + IntToHex( cmd->buf[12], 2 );
+
+         for ( unsigned char i = 0; i < cmd->buf[12]; i += 2 )
+            retorno += " " + IntToHex( toggleEndianess( readMemAs <unsigned short int> ( & cmd->buf[13 + i] ) ), 4 );
+      }
+
+      else if ( fc == 0x16 )
+      {
+         retorno += " " + IntToHex( toggleEndianess( readMemAs <unsigned short int> ( & cmd->buf[12] ) ), 4 );  // Máscara OR
+      }
+   }
+
+   return retorno;
+}
+
+
+AnsiString TModBusCmd::PrintModBusResp()
+{
+   unsigned char fc = 0;
+
+   AnsiString retorno = "";
+
+   if ( resp )
+   {
+      retorno  = "-->";
+
+      fc = resp->buf[7];
+
+      retorno += " " + IntToHex( toggleEndianess( readMemAs <unsigned short int> ( & resp->buf[0]  ) ), 4 );  // Transaction ID
+      retorno += " " + IntToHex( toggleEndianess( readMemAs <unsigned short int> ( & resp->buf[2]  ) ), 4 );  // Protocol ID (0x0000)
+      retorno += " " + IntToHex( toggleEndianess( readMemAs <unsigned short int> ( & resp->buf[4]  ) ), 4 );  // Length (0x0006)
+      retorno += " " + IntToHex( resp->buf[6], 2 );                                                           // Slave Address
+      retorno += " " + IntToHex( resp->buf[7], 2 );                                                           // Function Code
+
+
+           if ( ( fc == 0x01 ) || ( fc == 0x02 ) )  // Respostas a comandos de 'Read Coil Status' ou 'Read Input Status'
+      {
+         retorno += " " + IntToHex( resp->buf[8], 2 );  // Bytes a Seguir
+
+         for ( int i = 0, bytes = resp->buf[8]; i < bytes; i++ )
+            retorno += " " + IntToHex( resp->buf[9 + i], 2 );  // Bytes de Dados
+      }
+
+      else if ( ( fc == 0x03 ) || ( fc == 0x04 ) )  // Respostas a comandos de 'Read Holding Registers' ou 'Read Input Registers'
+      {
+         retorno += " " + IntToHex( resp->buf[8], 2 );  // Bytes a Seguir
+
+         for ( int i = 0, words = resp->buf[8] / 2; i < words; i++ )
+            retorno += " " + IntToHex( toggleEndianess(  readMemAs <unsigned short int> ( & resp->buf[9 + i*2] ) ), 4 );  // Words de Dados
+      }
+
+      else if ( ( fc == 0x05 ) || ( fc == 0x06 ) ||  // Respostas a comandos de 'Force Single Coil' ou 'Preset Single Register'
+                ( fc == 0x0F ) || ( fc == 0x10 ) ||  // Respostas a comandos de 'Force Multiple Coils' ou 'Preset Multiple Registers'
+                ( fc == 0x16 ) )                     // Respostas a comandos de 'Mask Write Register'
+      {
+         retorno += " " + IntToHex( toggleEndianess( readMemAs <unsigned short int> ( & resp->buf[8]  ) ), 4 );  // Endereço
+         retorno += " " + IntToHex( toggleEndianess( readMemAs <unsigned short int> ( & resp->buf[10] ) ), 4 );  // Qtd ou Valor ou Máscara AND
+      }
+
+
+      if ( fc == 0x16 )
+         retorno += " " + IntToHex( toggleEndianess( readMemAs <unsigned short int> ( & resp->buf[12] ) ), 4 );  // Qtd ou Valor ou Máscara OR
+   }
+
+   return retorno;
+}
+
+
+// Função Auxiliar que tenta distinguir e extrair buffers de dados ModBus de uma grande mensagem com vários concatenados
+
+bool ExtraiComandosDoBufferRecurs( byteBuffStruct *in, deque <byteBuffStruct*> *out )
+{
+   unsigned int tamBufModBus = 0;
+
+   bool retornoOK = true;
+
+   if ( ( ! in )          ||  // Se o ponteiro da struct de entrada veio NULL - falha
+        ( ! in->buf )     ||  // Se o ponteiro do 'buf' da struct veio NULL - falha
+        (   in->tam < 6 ) )   // Se veio um buffer de tamanho < 6 - falha, é um pedaço corrompido
+      retornoOK = false;
+
+   else
+   {
+      tamBufModBus = toggleEndianess( readMemAs <unsigned short int> ( & in->buf[4] ) ) + 6;
+
+
+      if ( in->tam < tamBufModBus )  // Se o tamanho do buffer que veio é menor do que o informado pelo cabeçalho ModBus - falha
+         retornoOK = false;
+
+      else if ( in->tam == tamBufModBus )  // Se o tamanho do buffer que veio é exatamente o informado pelo cabeçalho ModBus - OK
+      {
+         byteBuffStruct
+            *novoBufPt1 = new byteBuffStruct( in->buf, tamBufModBus );  // Cria um novo buffer e copia os dados para ele (Não há como saber se essa não é a última
+                                                                        // chamada recursiva da pilha e qdo retornar, 'in' será apagado. Vide novoBufPt2 abaixo)
+         out->push_back( novoBufPt1 );  // Retorna o Buffer na pilha
+      }
+
+      else  // Se o tamanho do buffer que veio é maior do que o informado pelo cabeçalho ModBus, pelo menos o começo do buffer recebido é válido. O extrai e testa denovo
+      {
+         int
+            tamBufPt1 = tamBufModBus,
+            tamBufPt2 = in->tam - tamBufPt1;
+
+         byteBuffStruct
+            *novoBufPt1 = new byteBuffStruct(   in->buf           ,tamBufPt1 ),
+            *novoBufPt2 = new byteBuffStruct( & in->buf[tamBufPt1],tamBufPt2 );
+
+         out->push_back( novoBufPt1 );
+
+         ExtraiComandosDoBufferRecurs( novoBufPt2, out );
+
+         delete novoBufPt2;
+      }
+   }
+
+   return retornoOK;
+}
+
+
+AnsiString PrintBuffAsModBusCmd( byteBuffStruct *cmd )
+{
+   unsigned char fc = 0;
+
+   AnsiString retorno = "";
+
+   if ( cmd )
+   {
+      retorno  = "<--";
+
+      fc = cmd->buf[7];
+
+      retorno += " " + IntToHex( toggleEndianess( readMemAs <unsigned short int> ( & cmd->buf[0]  ) ), 4 );  // Transaction ID
+      retorno += " " + IntToHex( toggleEndianess( readMemAs <unsigned short int> ( & cmd->buf[2]  ) ), 4 );  // Protocol ID (0x0000)
+      retorno += " " + IntToHex( toggleEndianess( readMemAs <unsigned short int> ( & cmd->buf[4]  ) ), 4 );  // Length (0x0006)
+      retorno += " " + IntToHex( cmd->buf[6], 2 );                                                           // Slave Address
+      retorno += " " + IntToHex( cmd->buf[7], 2 );                                                           // Function Code
+      retorno += " " + IntToHex( toggleEndianess( readMemAs <unsigned short int> ( & cmd->buf[8]  ) ), 4 );  // Endereço
+      retorno += " " + IntToHex( toggleEndianess( readMemAs <unsigned short int> ( & cmd->buf[10] ) ), 4 );  // Qtd ou Valor ou Máscara AND
+
+
+           if ( fc == 0x0F )
+      {
+         retorno += " " + IntToHex( cmd->buf[12], 2 );
+
+         for ( unsigned char i = 0; i < cmd->buf[12]; i++ )
+            retorno += " " + IntToHex( cmd->buf[13 + i], 2 );
+      }
+
+      else if ( fc == 0x10 )
+      {
+         retorno += " " + IntToHex( cmd->buf[12], 2 );
+
+         for ( unsigned char i = 0; i < cmd->buf[12]; i += 2 )
+            retorno += " " + IntToHex( toggleEndianess( readMemAs <unsigned short int> ( & cmd->buf[13 + i] ) ), 4 );
+      }
+
+      else if ( fc == 0x16 )
+      {
+         retorno += " " + IntToHex( toggleEndianess( readMemAs <unsigned short int> ( & cmd->buf[12] ) ), 4 );  // Máscara OR
+      }
+   }
+
+   return retorno;
+}
+
+
+AnsiString PrintBuffAsModBusResp( byteBuffStruct *resp )
+{
+   unsigned char fc = 0;
+
+   AnsiString retorno = "";
+
+   if ( resp )
+   {
+      retorno  = "-->";
+
+      fc = resp->buf[7];
+
+      retorno += " " + IntToHex( toggleEndianess( readMemAs <unsigned short int> ( & resp->buf[0]  ) ), 4 );  // Transaction ID
+      retorno += " " + IntToHex( toggleEndianess( readMemAs <unsigned short int> ( & resp->buf[2]  ) ), 4 );  // Protocol ID (0x0000)
+      retorno += " " + IntToHex( toggleEndianess( readMemAs <unsigned short int> ( & resp->buf[4]  ) ), 4 );  // Length (0x0006)
+      retorno += " " + IntToHex( resp->buf[6], 2 );                                                           // Slave Address
+      retorno += " " + IntToHex( resp->buf[7], 2 );                                                           // Function Code
+
+
+           if ( ( fc == 0x01 ) || ( fc == 0x02 ) )  // Respostas a comandos de 'Read Coil Status' ou 'Read Input Status'
+      {
+         retorno += " " + IntToHex( resp->buf[8], 2 );  // Bytes a Seguir
+
+         for ( int i = 0, bytes = resp->buf[8]; i < bytes; i++ )
+            retorno += " " + IntToHex( resp->buf[9 + i], 2 );  // Bytes de Dados
+      }
+
+      else if ( ( fc == 0x03 ) || ( fc == 0x04 ) )  // Respostas a comandos de 'Read Holding Registers' ou 'Read Input Registers'
+      {
+         retorno += " " + IntToHex( resp->buf[8], 2 );  // Bytes a Seguir
+
+         for ( int i = 0, words = resp->buf[8] / 2; i < words; i++ )
+            retorno += " " + IntToHex( toggleEndianess(  readMemAs <unsigned short int> ( & resp->buf[9 + i*2] ) ), 4 );  // Words de Dados
+      }
+
+      else if ( ( fc == 0x05 ) || ( fc == 0x06 ) ||  // Respostas a comandos de 'Force Single Coil' ou 'Preset Single Register'
+                ( fc == 0x0F ) || ( fc == 0x10 ) ||  // Respostas a comandos de 'Force Multiple Coils' ou 'Preset Multiple Registers'
+                ( fc == 0x16 ) )                     // Respostas a comandos de 'Mask Write Register'
+      {
+         retorno += " " + IntToHex( toggleEndianess( readMemAs <unsigned short int> ( & resp->buf[8]  ) ), 4 );  // Endereço
+         retorno += " " + IntToHex( toggleEndianess( readMemAs <unsigned short int> ( & resp->buf[10] ) ), 4 );  // Qtd ou Valor ou Máscara AND
+      }
+
+
+      if ( fc == 0x16 )
+         retorno += " " + IntToHex( toggleEndianess( readMemAs <unsigned short int> ( & resp->buf[12] ) ), 4 );  // Qtd ou Valor ou Máscara OR
+   }
+
+   return retorno;
+}
+
+#endif
