@@ -3,21 +3,21 @@
 //MAURICIO ANDRADE LEMME - ASSISTENTE DE ENGENHARIA
 //IPqM - INSTITUTO DE PESQUISAS DA MARINHA
 //GSD - GRUPO DE SISTEMAS DIGITAIS
-//FUNDEP - FUNDA«√O DE DESENVOLVIMENTO DA PESQUISA
+//FUNDEP - FUNDA√á√ÉO DE DESENVOLVIMENTO DA PESQUISA
 
-//EMULADOR DE SINAIS DE COMUNICA«√O DOS MCPS
+//EMULADOR DE SINAIS DE COMUNICA√á√ÉO DOS MCPS
 //NAVIO MODELO.....: V-32 JULIO DE NORONHA (INHAUMA)
-//USU¡RIO FINAL....: EQUIPE CLP
-//VERS√O INICIAL...: V001b
-//M”DULO...........: MCP
-//DATA DE INÕCIO...: 22.06.2015
-//DATA DE PROT”TIPO:
-//DATA DE T…RMINO..:
-//DATA DE ATUALIZ..:
-//DESIGNA«√O.......: ESTE M”DULO DO SOFTWARE TEM COMO OBJETIVO EMULAR A COMUNICA«√O
+//USU√ÅRIO FINAL....: EQUIPE CLP
+//VERS√ÉO INICIAL...: V001b
+//M√ìDULO...........: MCP
+//DATA DE IN√çCIO...: 22.06.2015
+//DATA DE PROT√ìTIPO: 01.12.2017
+//DATA DE T√âRMINO..: 30.06.2023
+//DATA DE ATUALIZ..: 30.06.2023
+//DESIGNA√á√ÉO.......: ESTE M√ìDULO DO SOFTWARE TEM COMO OBJETIVO EMULAR A COMUNICA√á√ÉO
 //SERIAL DOS MCPS
-//EM COPARCERIA DESTE M”DULO ESTA O M”DULO DE COMUNICA«√O MODBUS DE AUTORIA DO
-//FUNCION¡RIO F¡BIO TEIXEIRA, SUA IMPLEMENTA«√O … DESCONHECIDA
+//EM COPARCERIA DESTE M√ìDULO ESTA O M√ìDULO DE COMUNICA√á√ÉO MODBUS DE AUTORIA DO
+//FUNCION√ÅRIO F√ÅBIO TEIXEIRA, SUA IMPLEMENTA√á√ÉO √â DESCONHECIDA
 //***************************************************************************
 #include <vcl.h>
 #pragma hdrstop
@@ -26,7 +26,7 @@
 //#include "TModBusScanner.cpp" /* DRIVER MODBUS */
 #include "ModBusDriverLib\TModBusTCPDriver.cpp"
 
-//----------------- ENDERE«OS DOS EQUIPAMENTOS -----------------
+//----------------- ENDERE√áOS DOS EQUIPAMENTOS -----------------
 String MCPBE_ETH1_MAINWD     = "%MW2464";
 String MCPBE_ETH1_STDBWD     = "%MW2465";
 String MCPBE_ETH2_MAINWD     = "%MW2466";
@@ -53,7 +53,7 @@ String TG_ETH2_WD            = "%MW2673";
 
 String IP              = "120.40.0.1";
 String CONTADOR_CONEXAO= "%MW33000";
-String NomeForm        = "COMUNICA«√O SERIAL";
+String NomeForm        = "COMUNICA√á√ÉO SERIAL";
 bool   perdaconexao    = false;
 int    Varredura       = 0;
 float  VALOR_ANTIGO    = 0;
@@ -91,15 +91,15 @@ bool ativaETH2_TG = true;
 #pragma package(smart_init)
 #pragma resource "*.dfm"
 TfrmPrincipal *frmPrincipal;
-//INCIALIZA«√O DO DRIVER
+//INCIALIZA√á√ÉO DO DRIVER
 //TModBusScanner CLP ( frmPrincipal, QUANTUM, 3, 1 );
-//INCIALIZA«√O DO DRIVER
+//INCIALIZA√á√ÉO DO DRIVER
 TModBusTCPDriver CLP( frmPrincipal,IP,QUANTUM );
 //---------------------------------------------------------------------------
 __fastcall TfrmPrincipal::TfrmPrincipal(TComponent* Owner)
         : TForm(Owner)
 {
-//CADASTROS DOS ENDERE«OS UTILIZADOS
+//CADASTROS DOS ENDERE√áOS UTILIZADOS
 /*      CLP.CadastraLeitura(MCPBE_ETH1_MAINWD);
         CLP.CadastraLeitura(MCPBE_ETH1_STDBWD);
         CLP.CadastraLeitura(MCPBE_ETH2_MAINWD);
@@ -124,9 +124,9 @@ __fastcall TfrmPrincipal::TfrmPrincipal(TComponent* Owner)
 void __fastcall TfrmPrincipal::FormCreate(TObject *Sender)
 {
         AnsiString TimeStamp;
-//ABERTURA DA CONEX√O COM CLP
+//ABERTURA DA CONEX√ÉO COM CLP
         CLP.Open(IP);
-//INÕCIO DA INICIALIZA«√O
+//IN√çCIO DA INICIALIZA√á√ÉO
         frmPrincipal->Caption = NomeForm + " - Carregando";
         frmPrincipal->Top = 10;
         frmPrincipal->Left = 10;
@@ -144,7 +144,7 @@ void __fastcall TfrmPrincipal::FormCreate(TObject *Sender)
 //---------------------------------------------------------------------------
 void __fastcall TfrmPrincipal::ConexaoWatchTimer(TObject *Sender)
 {
-//TIMER DE VERIFICA«√O DE CONEX√O
+//TIMER DE VERIFICA√á√ÉO DE CONEX√ÉO
         lblProgramaAtual->Visible = true;
         lblTamListaIDs->Visible = true;
         lblQuedas->Visible = true;
@@ -267,7 +267,7 @@ void __fastcall TfrmPrincipal::tmrStartingTimer(TObject *Sender)
 
         Lista->Enabled = true;
 
-//FIM DA INICIALIZA«√O
+//FIM DA INICIALIZA√á√ÉO
         tmrStarting->Enabled = false;
 }
 //---------------------------------------------------------------------------
@@ -641,7 +641,7 @@ void __fastcall TfrmPrincipal::btnSTDBBEClick(TObject *Sender)
 
 void __fastcall TfrmPrincipal::tmrReconectaTimer(TObject *Sender)
 {
-        //RECONEX√O
+        //RECONEX√ÉO
         CLP.Open(IP);
         tmrReconecta->Enabled = false;           
 }
