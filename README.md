@@ -3,8 +3,8 @@
 <p>Projeto utilizado para os testes do SCM no âmbito da equipe de desenvolvimento para CLP e integrações com a IHM.<br>Desenvolvido no IPqM - Instituto de Pesquisas da Marinha, no GSD - Grupo de Sistemas Digitais, na divisão 142 - Automação e Controle.</p>
 <li>Utiliza comunicação através do protocolo ModBus para interface com um CLP do fabricante Schnneider Electric;</li>
 <li>Os módulos da propulsão não apresentam rates ou curvas essencialmente reais, mas suficientes para executar os testes com tempo de respostas suficiente;</li>
-<li>O módulo auxiliares visa antender testes de funcionalidade e integração com a IHM</li>
-<li>O MR se refere a um sistema backup na arquitetura, que se alimenta dos mesmos dados do principal</li>
+<li>O módulo auxiliares visa antender testes de funcionalidade e integração com a IHM;</li>
+<li>O MR se refere a um sistema backup na arquitetura, que se alimenta dos mesmos dados do principal.</li>
 
 <br>
 <h2>## :rocket: Tecnologias</h2>
