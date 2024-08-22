@@ -1,0 +1,151 @@
+   bool respostaValida = false;
+
+   if ( _buf && ( _tam > 7 ) )  // Garante que pode ler os 7 primeiros Bytes do Header ModBus TCP
+   {
+      unsigned char _fc = _buf[7];
+
+      if ( (   id == changeEndianess( readMemAs <unsigned short int> ( & _buf[0] ) )     ) &&  // Se a resposta possuir o mesmo id e,
+           ( _tam == changeEndianess( readMemAs <unsigned short int> ( & _buf[4] ) ) + 6 ) &&  // Se o buffer veio íntegro e
+           (   fc == ( 0x7F & _fc ) ) )                                                        // Se o Function Code, com erro ou não, se refere ao fc deste
+      {
+         if ( ( _fc & 0x80 ) > 0 )  // Se a tentativa de execução do comando gerou um erro
+         {
+            switch ( _buf[8] )
+            {
+               case 0x01: erro = "ILLEGAL FUNCTION"; break;
+
+               /* The function code received in the query is not an allowable action for the server (or slave). This
+                * may be because the function code is only applicable to newer devices, and was not implemented in
+                * the unit selected. It could also indicate that the server (or slave) is in the wrong state to process
+                * a request of this type, for example because it is unconfigured and is being asked to return register values.
+                */
+
+               case 0x02: erro = "ILLEGAL DATA ADDRESS"; break;
+
+               /* The data address received in the query is not an allowable address for the server (or slave). More
+                * specifically, the combination of reference number and transfer length is invalid. For a controller with
+                * 100 registers, the PDU addresses the first register as 0, and the last one as 99. If a request is
+                * submitted with a starting register address of 96 and a quantity of registers of 4, then this request
+                * will successfully operate (address-wise at least) on registers 96, 97, 98, 99. If a request is
+                * submitted with a starting register address of 96 and a quantity of registers of 5, then this request
+                * will fail with Exception Code 0x02 “Illegal Data Address” since it attempts to operate on registers
+                * 96, 97, 98, 99 and 100, and there is no register with address 100.
+                */
+
+               case 0x03: erro = "ILLEGAL DATA VALUE"; break;
+
+               /* A value contained in the query data field is not an allowable value for server (or slave). This
+                * indicates a fault in the structure of the remainder of a complex request, such as that the implied
+                * length is incorrect. It specifically does NOT mean that a data item submitted for storage in a register
+                * has a value outside the expectation of the application program, since the MODBUS protocol is unaware
+                * of the significance of any particular value of any particular register.
+                */
+
+               case 0x04: erro = "SLAVE DEVICE FAILURE"; break;
+
+               // An unrecoverable error occurred while the server (or slave) was attempting to perform the requested action.
+
+               case 0x05: erro = "ACKNOWLEDGE"; break;
+
+               /* Specialized use in conjunction with programming commands. The server (or slave) has accepted the request
+                * and is processing it, but a long duration of time will be required to do so. This response is returned
+                * to prevent a timeout error from occurring in the client (or master). The client (or master) can next
+                * issue a Poll Program Complete message to determine if processing is completed.
+                */
+
+               case 0x06: erro = "SLAVE DEVICE BUSY"; break;
+
+               /* Specialized use in conjunction with programming commands. The server (or slave) is engaged in processing a
+                * long–duration program command. The client (or master) should retransmit the message later when the server
+                * (or slave) is free.
+                */
+            }
+         }
+         else  // Se não gerou um erro, prossegue tentando parsear a resposta
+         {
+            slaveAddr = _buf[6];
+
+
+                 if ( ( fc == 0x01 ) || ( fc == 0x02 ) )  // Respostas a comandos de 'Read Coil Status' ou 'Read Input Status'
+            {
+               int bytes = _buf[8];  // Número de Bytes de Dados que virão
+
+               if ( bytes == ( 1 + qtd / 8 ) )
+               {
+                  respostaValida = true;
+
+                  b_vals = new bool [ bytes * 8 ];
+                  memset( b_vals, 0, sizeof(bool) * bytes * 8 );
+
+                  for ( int i = 0; i < bytes * 8; i++ )
+                     b_vals[i] = GET_BIT_IN_BYTE( _buf[ 9 + i/8 ], i%8 );
+               }
+            }
+
+            else if ( ( fc == 0x03 ) || ( fc == 0x04 ) )  // Respostas a comandos de 'Read Holding Registers' ou 'Read Input Registers'
+            {
+               int words = _buf[8] / 2;  // Número de Words que virão
+
+               if ( words == qtd )
+               {
+                  respostaValida = true;
+
+                  i_vals = new short int [ words ];
+                  memset( i_vals, 0, sizeof(short int) * words / 2 );
+
+                  for ( int i = 0; i < words; i++ )
+                     i_vals[i] = changeEndianess( readMemAs <unsigned short int> ( & _buf[ 9 + i*2 ] ) );
+               }
+            }
+
+            else if ( ( fc == 0x05 ) || ( fc == 0x06 ) )  // Respostas a comandos de 'Force Single Coil' ou 'Preset Single Register'
+            {
+               // Como as Respostas a Esses Comandos são Ecos:
+
+               short int
+                  _end = changeEndianess( readMemAs <unsigned short int> ( & _buf[8]  ) ),
+                  _val = changeEndianess( readMemAs <unsigned short int> ( & _buf[10] ) );
+
+               if ( ( fc == 0x05 ) && ( _val ) )
+                  _val = 1;
+
+
+               if ( ( end == _end ) &&  // Se o Eco do Endereço Escrito for igual ao endereço armazenado e,
+                    ( val == _val ) )   // Se o Eco do Valor Escrito for igual ao valor armazenado
+                  respostaValida = true;
+            }
+
+            else if ( ( fc == 0x0F ) || ( fc == 0x10 ) )  // Respostas a comandos de 'Force Multiple Coils' ou 'Preset Multiple Registers'
+            {
+               // Como as Respostas a Esses Comandos são Ecos:
+
+               if ( ( end == changeEndianess( readMemAs <unsigned short int> ( & _buf[8]  ) ) ) &&  // Se o Eco do Endereço Escrito for igual ao endereço armazenado e,
+                    ( qtd == changeEndianess( readMemAs <unsigned short int> ( & _buf[10] ) ) ) )   // Se o Eco da Quantidade Escrita for igual ao valor armazenado
+                  respostaValida = true;
+            }
+
+            else if ( fc == 0x16 ) // Respostas a comandos de 'Force Multiple Coils' ou 'Preset Multiple Registers'
+            {
+               short int
+                  _end = changeEndianess( readMemAs <unsigned short int> ( & _buf[8]  ) ),
+                  _and = changeEndianess( readMemAs <unsigned short int> ( & _buf[10] ) ),
+                  _or  = changeEndianess( readMemAs <unsigned short int> ( & _buf[12] ) );
+
+               if ( ( end == _end ) &&
+                    ( val == (0xFFFF && _and) || (_or && ! _and) ) )
+                  respostaValida = true;
+            }
+
+
+            if ( respostaValida )
+            {
+               bufferResp = new unsigned char [ _tam ];
+               memcpy( bufferResp, _buf, _tam );
+            }
+         }
+      }
+
+   }
+
+
+   return respostaValida;
