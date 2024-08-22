@@ -4,20 +4,20 @@
 //MAURICIO ANDRADE LEMME - ANALISTA DE SISTEMAS J2
 //IPqM - INSTITUTO DE PESQUISAS DA MARINHA
 //GSD - GRUPO DE SISTEMAS DIGITAIS
-//FUNDEP - FUNDA«√O DE DESENVOLVIMENTO DA PESQUISA
+//FUNDEP - FUNDA√á√ÉO DE DESENVOLVIMENTO DA PESQUISA
 
-//EMULADOR DE SINAIS DA PROPULS√O
+//EMULADOR DE SINAIS DA PROPULS√ÉO
 //NAVIO MODELO.....: V-32 JULIO DE NORONHA (INHAUMA)
-//USU¡RIO FINAL....: EQUIPE CLP
-//VERS√O INICIAL...: V001b
-//M”DULO...........: ER
-//DATA DE INÕCIO...: 08.06.2016
-//DATA DE PROT”TIPO: 21.06.2016
-//DATA DE T…RMINO..: 15.05.2017
-//DATA DE ATUALIZ..: 29.11.2017
-//DESIGNA«√O.......: ESTE M”DULO DO SOFTWARE TEM COMO OBJETIVO EMULAR O FUNCIONAMENTO DO ER BB
-//EM COPARCERIA DESTE M”DULO ESTA O M”DULO DE COMUNICA«√O MODBUS DE AUTORIA DO
-//FUNCION¡RIO F¡BIO TEIXEIRA, SUA IMPLEMENTA«√O … DESCONHECIDA
+//USU√ÅRIO FINAL....: EQUIPE CLP
+//VERS√ÉO INICIAL...: V001b
+//M√ìDULO...........: ER
+//DATA DE IN√çCIO...: 08.06.2016
+//DATA DE PROT√ìTIPO: 21.06.2016
+//DATA DE T√âRMINO..: 15.05.2017
+//DATA DE ATUALIZ..: 28.06.2023
+//DESIGNA√á√ÉO.......: ESTE M√ìDULO DO SOFTWARE TEM COMO OBJETIVO EMULAR O FUNCIONAMENTO DO ER BB
+//EM COPARCERIA DESTE M√ìDULO ESTA O M√ìDULO DE COMUNICA√á√ÉO MODBUS DE AUTORIA DO
+//FUNCION√ÅRIO F√ÅBIO TEIXEIRA, SUA IMPLEMENTA√á√ÉO √â DESCONHECIDA
 //***************************************************************************
 #include <vcl.h>
 #pragma hdrstop
@@ -28,7 +28,7 @@
 #include "math.h"
 #include <cmath>
 
-//----------------- ENDERE«OS DOS EQUIPAMENTOS -----------------
+//----------------- ENDERE√áOS DOS EQUIPAMENTOS -----------------
 //--------------------------- BBELPN ---------------------------
 String CP_HL_ERHBC_BBELPN_LIBPEMERG             = "%MW510.8";
 String CP_HL_ERHBC_BBELPN_AUTOMATICO            = "%MW508.12";
@@ -140,7 +140,7 @@ String PC_SA_TBGAS_ATLAS_NTP                    = "%MF8120";
 String PC_HA_TBGAS_MCTG_NTP                     = "%MF6200";
 
 //------------------- VARIAVEIS DOS INTERNAS -------------------
-//DEFINI«√O DE CONEX√O
+//DEFINI√á√ÉO DE CONEX√ÉO
 String IP              = "120.40.0.1";
 String CONTADOR_CONEXAO= "%MW33000";
 String NomeForm        = "ER";
@@ -152,7 +152,7 @@ int    contador_scan   = 0;
 int    numeroquedas    = 0;
 int    lista           = 0;
 
-//DEFINI«√O INTERNA
+//DEFINI√á√ÉO INTERNA
 float   pressao           = 0.0;
 bool    AF_BB_CHEIO       = false;
 bool    AF_BE_CHEIO       = false;
@@ -193,7 +193,7 @@ bool    ctrl_auto_presost = false;
 #pragma resource "*.dfm"
 TfrmPrincipal *frmPrincipal;
 
-//CONFIGURA«√O DO DRIVER
+//CONFIGURA√á√ÉO DO DRIVER
 TModBusTCPDriver CLP ( frmPrincipal,IP,QUANTUM );
 
 //---------------------------------------------------------------------------
@@ -206,9 +206,9 @@ __fastcall TfrmPrincipal::TfrmPrincipal(TComponent* Owner)
 void __fastcall TfrmPrincipal::FormCreate(TObject *Sender)
 {
         AnsiString TimeStamp;
-//ABERTURA DA CONEX√O COM CLP
+//ABERTURA DA CONEX√ÉO COM CLP
         CLP.Open(IP);
-//INÕCIO DA INICIALIZA«√O
+//IN√çCIO DA INICIALIZA√á√ÉO
         frmPrincipal->Caption = NomeForm + " - Carregando";
         frmPrincipal->Top = 0;
         frmPrincipal->Left = 0;
@@ -234,15 +234,15 @@ void __fastcall TfrmPrincipal::FormCreate(TObject *Sender)
         lblEndereco->Visible = true;
         lblWatchdogEx->Visible = true;
 
-//CHAMA TIMER DE INICIALIZA«√O
+//CHAMA TIMER DE INICIALIZA√á√ÉO
         tmrStarting->Enabled = true;
 }
 //---------------------------------------------------------------------------
 void __fastcall TfrmPrincipal::tmrStartingTimer(TObject *Sender)
 {
-//TIMER DE INICIALIZ√«√O
+//TIMER DE INICIALIZ√É√á√ÉO
 //-------------------------------------------------------------
-//--------------------- INICIA ANAL”GICAS ---------------------
+//--------------------- INICIA ANAL√ìGICAS ---------------------
 //        CLP.WR( VARIAVEL_ANALOGICA , VALOR INCIAL);
 //        PROGRESS_BAR>Max = 100 * 1000;
 //        PROGRESS_BAR->Min = -100 * 1000;
@@ -425,7 +425,7 @@ void __fastcall TfrmPrincipal::tmrStartingTimer(TObject *Sender)
 
 
 //-------------------------------------------------------------
-//ACIONA TODOS OS ENDERE«OS DE SIMULA«√O
+//ACIONA TODOS OS ENDERE√áOS DE SIMULA√á√ÉO
         for (int i = 3010; i < 3236; i++){
                 String tempMW = "%MW" ;
                 tempMW += i;
@@ -455,13 +455,13 @@ void __fastcall TfrmPrincipal::tmrStartingTimer(TObject *Sender)
         lblInit8->Caption   = "SSSK2";
         lblInit9->Caption   = "SSSK3";
         lblInit10->Caption  = "SSSK4";
-        //INFORMA«’ES FIXAS
+        //INFORMA√á√ïES FIXAS
         lblInit11->Caption  = "BBELPN";
         lblInit12->Caption  = "MODPRI";
         lblInit13->Caption  = "MODSBB";
         lblInit14->Caption  = "MODSBE";
-        lblInit15->Caption = "RotaÁ„o Eixo BB";
-        lblInit16->Caption = "RotaÁ„o Eixo BE";
+        lblInit15->Caption = "Rota√ß√£o Eixo BB";
+        lblInit16->Caption = "Rota√ß√£o Eixo BE";
         lblInit17->Caption = "SSSK1 TG BB MPRI";
         lblInit18->Caption = "SSSK2 TG BE MPRI";
         lblInit19->Caption = "SSSK3 MCP BB MSEC";
@@ -480,13 +480,13 @@ void __fastcall TfrmPrincipal::tmrStartingTimer(TObject *Sender)
 
         btnReset->Enabled = true;
 
-//FIM DA INICIALIZA«√O
+//FIM DA INICIALIZA√á√ÉO
         tmrStarting->Enabled = false;
 }
 //---------------------------------------------------------------------------
 void __fastcall TfrmPrincipal::ConexaoWatchTimer(TObject *Sender)
 {
-//TIMER DE VERIFICA«√O DE CONEX√O
+//TIMER DE VERIFICA√á√ÉO DE CONEX√ÉO
         lblProgramaAtual->Visible = true;
         lblTamListaIDs->Visible = true;
         lblQuedas->Visible = true;
@@ -594,7 +594,7 @@ void __fastcall TfrmPrincipal::ConexaoWatchTimer(TObject *Sender)
 //---------------------------------------------------------------------------
 void __fastcall TfrmPrincipal::tmrReconectaTimer(TObject *Sender)
 {
-//RECONEX√O
+//RECONEX√ÉO
         CLP.Open(IP);
         tmrReconecta->Enabled = false;
 }
@@ -611,7 +611,7 @@ void __fastcall TfrmPrincipal::tmrLeituraTimer(TObject *Sender)
 	}
 	else{
 		shpAUTOHDWSCMDES_BBELPN->Brush->Color = clWhite;
-		btnAUTOHDWSCMDES_BBELPN->Caption = "— AUTOHDWSCMDES";
+		btnAUTOHDWSCMDES_BBELPN->Caption = "√ë AUTOHDWSCMDES";
 	};
 
         if ( CLP.RD(PC_HL_ERHBC_BBELPN_AUTOHDWSCMLIG) == 1 ){
@@ -620,7 +620,7 @@ void __fastcall TfrmPrincipal::tmrLeituraTimer(TObject *Sender)
 	}
 	else{
 		shpAUTOHDWSCMLIG_BBELPN->Brush->Color = clWhite;
-		btnAUTOHDWSCMLIG_BBELPN->Caption = "— AUTOHDWSCMLIG";
+		btnAUTOHDWSCMLIG_BBELPN->Caption = "√ë AUTOHDWSCMLIG";
 	};
 
         if ( CLP.RD(PC_HL_ERHBC_BBELPN_PRDEMERGSCMLI) == 1 ){
@@ -629,7 +629,7 @@ void __fastcall TfrmPrincipal::tmrLeituraTimer(TObject *Sender)
 	}
 	else{
 		shpPRDEMERGSCMLI_BBELPN->Brush->Color = clWhite;
-		btnPRDEMERGSCMLI_BBELPN->Caption = "— PRDEMERGSCMLI";
+		btnPRDEMERGSCMLI_BBELPN->Caption = "√ë PRDEMERGSCMLI";
 	};
 
         if ( CLP.RD(PC_HL_ERHBC_BBELPN_PRDEMERGSCMDE) == 1 ){
@@ -638,7 +638,7 @@ void __fastcall TfrmPrincipal::tmrLeituraTimer(TObject *Sender)
 	}
 	else{
 		shpPRDEMERGSCMDE_BBELPN->Brush->Color = clWhite;
-		btnPRDEMERGSCMDE_BBELPN->Caption = "— PRDEMERGSCMDE";
+		btnPRDEMERGSCMDE_BBELPN->Caption = "√ë PRDEMERGSCMDE";
 	}
 
         if ( CLP.RD(PC_HL_ERHBC_BBELPN_EMAUT) == 1 ){
@@ -701,7 +701,7 @@ void __fastcall TfrmPrincipal::tmrLeituraTimer(TObject *Sender)
 
         if ( CLP.RD(CP_HL_ERHBC_BBELPN_PARAREMERG) == 1 ){
 		shpEmerg_BBELPN->Brush->Color = clRed;
-		if ((btnMOTELLIG_BBELPN->Caption == "Mot. El. Ligado" || btnMOTPNLIG_BBELPN->Caption == "Mot. Pn. Ligado") || btnPRDEMERGSCMLI_BBELPN->Caption == "— PRDEMERGSCMLI" ){
+		if ((btnMOTELLIG_BBELPN->Caption == "Mot. El. Ligado" || btnMOTPNLIG_BBELPN->Caption == "Mot. Pn. Ligado") || btnPRDEMERGSCMLI_BBELPN->Caption == "√ë PRDEMERGSCMLI" ){
                         tmrPartir_ERHBC_BBELPN->Enabled = false;
                         CLP.WR( PC_HL_ERHBC_BBELPN_MOTELLIG, 0 );
                         CLP.WR( PC_HL_ERHBC_BBELPN_MOTPNLIG, 0 );
@@ -768,7 +768,7 @@ void __fastcall TfrmPrincipal::tmrLeituraTimer(TObject *Sender)
 		if (btnEmAut_BBELPN->Caption == "Em Manual"){
                         CLP.WR( PC_HL_ERHBC_BBELPN_EMAUT, 1 );
                 }
-                if(btnAUTOHDWSCMLIG_BBELPN->Caption == "— AUTOHDWSCMLIG"){
+                if(btnAUTOHDWSCMLIG_BBELPN->Caption == "√ë AUTOHDWSCMLIG"){
                         CLP.WR( PC_HL_ERHBC_BBELPN_AUTOHDWSCMDES, 0 );
                         CLP.WR( PC_HL_ERHBC_BBELPN_AUTOHDWSCMLIG, 1 );
 		}
@@ -967,7 +967,7 @@ void __fastcall TfrmPrincipal::tmrLeituraTimer(TObject *Sender)
 	}
         else{
                 shpSSSK1_ACPL->Brush->Color = clWhite;
-		btnSSSK1_ACPL->Caption = "N„o Acoplada";
+		btnSSSK1_ACPL->Caption = "N√£o Acoplada";
         }
 
         if ( CLP.RD(PC_HL_ERPBC_SSSK1_DACPL) == 1 ){
@@ -977,7 +977,7 @@ void __fastcall TfrmPrincipal::tmrLeituraTimer(TObject *Sender)
 	}
         else{
                 shpSSSK1_DACPL->Brush->Color = clWhite;
-		btnSSSK1_DACPL->Caption = "N„o Desacoplada";
+		btnSSSK1_DACPL->Caption = "N√£o Desacoplada";
         }
 
         if ( CLP.RD(PC_HL_ERPBC_SSSK1_TRAVABER) == 1 ){
@@ -988,18 +988,18 @@ void __fastcall TfrmPrincipal::tmrLeituraTimer(TObject *Sender)
 	}
         else{
                 shpSSSK1_TRAVABER->Brush->Color = clWhite;
-		btnSSSK1_TRAVABER->Caption = "Travada Aberta — OK";
+		btnSSSK1_TRAVABER->Caption = "Travada Aberta √ë OK";
         }
 
         if ( CLP.RD(PC_HL_ERPBC_SSSK1_NTRAVABER) == 1 ){
 	        shpSSSK1_NTRAVABER->Brush->Color = clYellow;
-		btnSSSK1_NTRAVABER->Caption = "N„o Travada Aberta";
+		btnSSSK1_NTRAVABER->Caption = "N√£o Travada Aberta";
                 SSS_TG_BB_TRANS = true;
                 btnSSSK1_FERRAMENTA->Caption = "ABRIR";
 	}
         else{
                 shpSSSK1_NTRAVABER->Brush->Color = clWhite;
-		btnSSSK1_NTRAVABER->Caption = "N„o Trav. Aberta — OK";
+		btnSSSK1_NTRAVABER->Caption = "N√£o Trav. Aberta √ë OK";
         }
 
         if ( CLP.RD(PC_HL_ERPBC_SSSK1_TRAVACPL) == 1 ){
@@ -1011,7 +1011,7 @@ void __fastcall TfrmPrincipal::tmrLeituraTimer(TObject *Sender)
 	}
         else{
                 shpSSSK1_TRAVACPL->Brush->Color = clWhite;
-		btnSSSK1_TRAVACPL->Caption = "N„o Travada";
+		btnSSSK1_TRAVACPL->Caption = "N√£o Travada";
                 SSS_TG_BB_TRAV   = false;
 
         }
@@ -1023,12 +1023,12 @@ void __fastcall TfrmPrincipal::tmrLeituraTimer(TObject *Sender)
 	}
         else{
                 shpSSSK1_NTRAVACPL->Brush->Color = clWhite;
-		btnSSSK1_NTRAVACPL->Caption = "N„o Destravada";
+		btnSSSK1_NTRAVACPL->Caption = "N√£o Destravada";
         }
 
         if ( CLP.RD(CP_HL_ERPBC_SSSK1_TRAVAR) == 1){
                 shpSSSK1_TRAVAR->Brush->Color = clLime;
-                if ( btnSSSK1_TRAVACPL->Caption == "N„o Travada" || btnSSSK1_NTRAVACPL->Caption == "Destravada"){
+                if ( btnSSSK1_TRAVACPL->Caption == "N√£o Travada" || btnSSSK1_NTRAVACPL->Caption == "Destravada"){
                         CLP.WR(PC_HL_ERPBC_SSSK1_NTRAVACPL, 0);
                         CLP.WR(PC_HL_ERPBC_SSSK1_TRAVACPL , 1);
                         SSS_TG_BB_TRAV   = true;
@@ -1036,7 +1036,7 @@ void __fastcall TfrmPrincipal::tmrLeituraTimer(TObject *Sender)
         }
         else{
                 shpSSSK1_TRAVAR->Brush->Color = clWhite;
-                if ( btnSSSK1_TRAVACPL->Caption == "Travada" || btnSSSK1_NTRAVACPL->Caption == "N„o Destravada"){
+                if ( btnSSSK1_TRAVACPL->Caption == "Travada" || btnSSSK1_NTRAVACPL->Caption == "N√£o Destravada"){
                         if (SSS_TG_BB_TRAV   == true){
                                 CLP.WR(PC_HL_ERPBC_SSSK1_TRAVACPL , 0);
                                 CLP.WR(PC_HL_ERPBC_SSSK1_NTRAVACPL, 1);
@@ -1055,7 +1055,7 @@ void __fastcall TfrmPrincipal::tmrLeituraTimer(TObject *Sender)
 	}
         else{
                 shpSSSK2_ACPL->Brush->Color = clWhite;
-		btnSSSK2_ACPL->Caption = "N„o Acoplada";
+		btnSSSK2_ACPL->Caption = "N√£o Acoplada";
         }
 
         if ( CLP.RD(PC_HL_ERPBC_SSSK2_DACPL) == 1 ){
@@ -1065,7 +1065,7 @@ void __fastcall TfrmPrincipal::tmrLeituraTimer(TObject *Sender)
 	}
         else{
                 shpSSSK2_DACPL->Brush->Color = clWhite;
-		btnSSSK2_DACPL->Caption = "N„o Desacoplada";
+		btnSSSK2_DACPL->Caption = "N√£o Desacoplada";
         }
 
         if ( CLP.RD(PC_HL_ERPBC_SSSK2_TRAVABER) == 1 ){
@@ -1076,18 +1076,18 @@ void __fastcall TfrmPrincipal::tmrLeituraTimer(TObject *Sender)
 	}
         else{
                 shpSSSK2_TRAVABER->Brush->Color = clWhite;
-		btnSSSK2_TRAVABER->Caption = "Travada Aberta — OK";
+		btnSSSK2_TRAVABER->Caption = "Travada Aberta √ë OK";
         }
 
         if ( CLP.RD(PC_HL_ERPBC_SSSK2_NTRAVABER) == 1 ){
 	        shpSSSK2_NTRAVABER->Brush->Color = clYellow;
-		btnSSSK2_NTRAVABER->Caption = "N„o Travada Aberta";
+		btnSSSK2_NTRAVABER->Caption = "N√£o Travada Aberta";
                 SSS_TG_BE_TRANS = true;
                 btnSSSK2_FERRAMENTA->Caption = "ABRIR";
 	}
         else{
                 shpSSSK2_NTRAVABER->Brush->Color = clWhite;
-		btnSSSK2_NTRAVABER->Caption = "N„o Trav. Aberta — OK";
+		btnSSSK2_NTRAVABER->Caption = "N√£o Trav. Aberta √ë OK";
         }
 
         if ( CLP.RD(PC_HL_ERPBC_SSSK2_TRAVACPL) == 1 ){
@@ -1098,7 +1098,7 @@ void __fastcall TfrmPrincipal::tmrLeituraTimer(TObject *Sender)
 	}
         else{
                 shpSSSK2_TRAVACPL->Brush->Color = clWhite;
-		btnSSSK2_TRAVACPL->Caption = "N„o Travada";
+		btnSSSK2_TRAVACPL->Caption = "N√£o Travada";
                 SSS_TG_BE_TRAV   = false;
         }
 
@@ -1109,12 +1109,12 @@ void __fastcall TfrmPrincipal::tmrLeituraTimer(TObject *Sender)
 	}
         else{
                 shpSSSK2_NTRAVACPL->Brush->Color = clWhite;
-		btnSSSK2_NTRAVACPL->Caption = "N„o Destravada";
+		btnSSSK2_NTRAVACPL->Caption = "N√£o Destravada";
         }
 
         if ( CLP.RD(CP_HL_ERPBC_SSSK2_TRAVAR) == 1){
                 shpSSSK2_TRAVAR->Brush->Color = clLime;
-                if ( btnSSSK2_TRAVACPL->Caption == "N„o Travada" || btnSSSK2_NTRAVACPL->Caption == "Destravada"){
+                if ( btnSSSK2_TRAVACPL->Caption == "N√£o Travada" || btnSSSK2_NTRAVACPL->Caption == "Destravada"){
                         CLP.WR(PC_HL_ERPBC_SSSK2_NTRAVACPL, 0);
                         CLP.WR(PC_HL_ERPBC_SSSK2_TRAVACPL , 1);
                         SSS_TG_BE_TRAV   = true;
@@ -1122,7 +1122,7 @@ void __fastcall TfrmPrincipal::tmrLeituraTimer(TObject *Sender)
         }
         else{
                 shpSSSK2_TRAVAR->Brush->Color = clWhite;
-                if ( btnSSSK2_TRAVACPL->Caption == "Travada" || btnSSSK2_NTRAVACPL->Caption == "N„o Destravada"){
+                if ( btnSSSK2_TRAVACPL->Caption == "Travada" || btnSSSK2_NTRAVACPL->Caption == "N√£o Destravada"){
                         if (SSS_TG_BE_TRAV   == true){
                                 CLP.WR(PC_HL_ERPBC_SSSK2_TRAVACPL , 0);
                                 CLP.WR(PC_HL_ERPBC_SSSK2_NTRAVACPL, 1);
@@ -1142,7 +1142,7 @@ void __fastcall TfrmPrincipal::tmrLeituraTimer(TObject *Sender)
 	}
         else{
                 shpSSSK3_ACPL->Brush->Color = clWhite;
-		btnSSSK3_ACPL->Caption = "N„o Acoplada";
+		btnSSSK3_ACPL->Caption = "N√£o Acoplada";
         }
 
         if ( CLP.RD(PC_HL_ERSBB_SSSK3_DACPL) == 1 ){
@@ -1152,7 +1152,7 @@ void __fastcall TfrmPrincipal::tmrLeituraTimer(TObject *Sender)
 	}
         else{
                 shpSSSK3_DACPL->Brush->Color = clWhite;
-		btnSSSK3_DACPL->Caption = "N„o Desacoplada";
+		btnSSSK3_DACPL->Caption = "N√£o Desacoplada";
         }
         
         if ( CLP.RD(PC_HL_ERSBB_SSSK3_TRAVACPL) == 1 ){
@@ -1163,7 +1163,7 @@ void __fastcall TfrmPrincipal::tmrLeituraTimer(TObject *Sender)
 	}
         else{
                 shpSSSK3_TRAVACPL->Brush->Color = clWhite;
-		btnSSSK3_TRAVACPL->Caption = "N„o Travada";
+		btnSSSK3_TRAVACPL->Caption = "N√£o Travada";
                 SSS_MCP_BB_TRAV  = false;
         }
 
@@ -1174,12 +1174,12 @@ void __fastcall TfrmPrincipal::tmrLeituraTimer(TObject *Sender)
 	}
         else{
                 shpSSSK3_NTRAVACPL->Brush->Color = clWhite;
-		btnSSSK3_NTRAVACPL->Caption = "N„o Destravada";
+		btnSSSK3_NTRAVACPL->Caption = "N√£o Destravada";
         }
 
         if ( CLP.RD(CP_HL_ERSBB_SSSK3_TRAVAR) == 1){
                 shpSSSK3_TRAVAR->Brush->Color = clLime;
-                if ( btnSSSK3_TRAVACPL->Caption == "Travada" || btnSSSK3_NTRAVACPL->Caption == "N„o Destravada"){
+                if ( btnSSSK3_TRAVACPL->Caption == "Travada" || btnSSSK3_NTRAVACPL->Caption == "N√£o Destravada"){
                         CLP.WR(PC_HL_ERSBB_SSSK3_TRAVACPL , 0);
                         CLP.WR(PC_HL_ERSBB_SSSK3_NTRAVACPL, 1);
                         SSS_MCP_BB_TRAV  = false;
@@ -1208,7 +1208,7 @@ void __fastcall TfrmPrincipal::tmrLeituraTimer(TObject *Sender)
 	}
         else{
                 shpSSSK4_ACPL->Brush->Color = clWhite;
-		btnSSSK4_ACPL->Caption = "N„o Acoplada";
+		btnSSSK4_ACPL->Caption = "N√£o Acoplada";
         }
 
         if ( CLP.RD(PC_HL_ERSBE_SSSK4_DACPL) == 1 ){
@@ -1218,7 +1218,7 @@ void __fastcall TfrmPrincipal::tmrLeituraTimer(TObject *Sender)
 	}
         else{
                 shpSSSK4_DACPL->Brush->Color = clWhite;
-		btnSSSK4_DACPL->Caption = "N„o Desacoplada";
+		btnSSSK4_DACPL->Caption = "N√£o Desacoplada";
         }
         
         if ( CLP.RD(PC_HL_ERSBE_SSSK4_TRAVACPL) == 1 ){
@@ -1229,7 +1229,7 @@ void __fastcall TfrmPrincipal::tmrLeituraTimer(TObject *Sender)
 	}
         else{
                 shpSSSK4_TRAVACPL->Brush->Color = clWhite;
-		btnSSSK4_TRAVACPL->Caption = "N„o Travada";
+		btnSSSK4_TRAVACPL->Caption = "N√£o Travada";
                 SSS_MCP_BE_TRAV  = false;
         }
 
@@ -1240,12 +1240,12 @@ void __fastcall TfrmPrincipal::tmrLeituraTimer(TObject *Sender)
 	}
         else{
                 shpSSSK4_NTRAVACPL->Brush->Color = clWhite;
-		btnSSSK4_NTRAVACPL->Caption = "N„o Destravada";
+		btnSSSK4_NTRAVACPL->Caption = "N√£o Destravada";
         }
 
         if ( CLP.RD(CP_HL_ERSBE_SSSK4_TRAVAR) == 1){
                 shpSSSK4_TRAVAR->Brush->Color = clLime;
-                if ( btnSSSK4_TRAVACPL->Caption == "Travada" || btnSSSK4_NTRAVACPL->Caption == "N„o Destravada"){
+                if ( btnSSSK4_TRAVACPL->Caption == "Travada" || btnSSSK4_NTRAVACPL->Caption == "N√£o Destravada"){
                         CLP.WR(PC_HL_ERSBE_SSSK4_TRAVACPL , 0);
                         CLP.WR(PC_HL_ERSBE_SSSK4_NTRAVACPL, 1);
                         SSS_MCP_BE_TRAV  = false;
@@ -1323,8 +1323,8 @@ void __fastcall TfrmPrincipal::tmrLeituraTimer(TObject *Sender)
 
 //=========================================================================================
 //================================ CONTROLE DAS SSS E======================================
-//================================ ROTA«√O DOS EIXOS ======================================
-        //DEFINI«√O DOS AFS
+//================================ ROTA√á√ÉO DOS EIXOS ======================================
+        //DEFINI√á√ÉO DOS AFS
         //BB
         if (CLP.RD(PC_SL_MCPBB_ECS_AFCHEIO) == 1 || CLP.RD(PC_HL_MCPBB_RTU_AFCHEIO) == 1){
                 AF_BB_CHEIO = true;
@@ -1345,7 +1345,7 @@ void __fastcall TfrmPrincipal::tmrLeituraTimer(TObject *Sender)
                         shpAFBE_CHEIO->Brush->Color = clWhite;
                 }
         }
-        //DEFINI«√O DAS ROTA«’ES
+        //DEFINI√á√ÉO DAS ROTA√á√ïES
         //*****************************MCP BB*****************************
         if (CLP.RD(PC_SA_MCPBB_ECS_MCPRPM) >= CLP.RD(PC_HA_MCPBB_RTU_MCPRPM)){
                 rotacao_MCP_BB = CLP.RD(PC_SA_MCPBB_ECS_MCPRPM);
@@ -1389,7 +1389,7 @@ void __fastcall TfrmPrincipal::tmrLeituraTimer(TObject *Sender)
         lblrefMCPBB->Caption =  FormatFloat("0.##",referencia_mcpbb);
         lblrefMCPBE->Caption =  FormatFloat("0.##",referencia_mcpbe);
         lblrefTG->Caption =  FormatFloat("0.##",referencia_tg);
-        //DEFINI«√O DAS SSS
+        //DEFINI√á√ÉO DAS SSS
         //*****************************  TG  *****************************
         if ( habilita_sss == true ){
         //K1
@@ -1456,7 +1456,7 @@ void __fastcall TfrmPrincipal::tmrLeituraTimer(TObject *Sender)
                         }
                 }
         }
-        //DEFINI«√O DAS ROTA«’ES
+        //DEFINI√á√ÉO DAS ROTA√á√ïES
         //EIXO BB
         if ( SSS_TG_BB_ACPL == true && habilita_edicao == false  && SSS_TG_BB_TRANS == true){
                 if (CLP.RD(PC_HA_ERSBB_MODSBB_EIXOBBRPM) != referencia_tg && referencia_tg > referencia_mcpbb ){
@@ -1517,7 +1517,7 @@ void __fastcall TfrmPrincipal::tmrLeituraTimer(TObject *Sender)
                         }
                 }
         }
-        //CALCULO TEMPERATURA ”LEO
+        //CALCULO TEMPERATURA √ìLEO
         if (referencia_tg > 0 &&  SSS_TG_BE_TRANS == true){
                 ROT_MOD_PRI = true;
                 if (SSS_TG_BB_ACPL == true){
@@ -1585,7 +1585,7 @@ void __fastcall TfrmPrincipal::tmrLeituraTimer(TObject *Sender)
         }
 
 
-        //EXIBI«√O DO ESCORREGAMENTO
+        //EXIBI√á√ÉO DO ESCORREGAMENTO
         lblEscorregBB->Caption = FormatFloat("0.##",escorreg_bb);
         lblEscorregBE->Caption = FormatFloat("0.##",escorreg_be);
 
@@ -1599,7 +1599,7 @@ void __fastcall TfrmPrincipal::tmrLeituraTimer(TObject *Sender)
         btnSSSK4_DACPL->Enabled = !habilita_sss;
 
 
-        //INFORMA«’ES FIXAS
+        //INFORMA√á√ïES FIXAS
         shpMOTELLIG_BBELPN2->Brush->Color = shpMOTELLIG_BBELPN->Brush->Color;
         shpRemoto_BBELPN2->Brush->Color = shpRemoto_BBELPN->Brush->Color;
         shpMODHID_OLPBX2->Brush->Color = shpMODHID_OLPBX->Brush->Color;
@@ -1634,7 +1634,7 @@ void __fastcall TfrmPrincipal::tmrLeituraTimer(TObject *Sender)
 
 void __fastcall TfrmPrincipal::btnAUTOHDWSCMDES_BBELPNClick(TObject *Sender)
 {
-	if (btnAUTOHDWSCMDES_BBELPN->Caption == "— AUTOHDWSCMDES"){
+	if (btnAUTOHDWSCMDES_BBELPN->Caption == "√ë AUTOHDWSCMDES"){
 		CLP.WR( PC_HL_ERHBC_BBELPN_AUTOHDWSCMDES, 1 );
 	}
 	else{
@@ -1668,7 +1668,7 @@ void __fastcall TfrmPrincipal::btnRemoto_BBELPNClick(TObject *Sender)
 void __fastcall TfrmPrincipal::btnAUTOHDWSCMLIG_BBELPNClick(
       TObject *Sender)
 {
-	if (btnAUTOHDWSCMLIG_BBELPN->Caption == "— AUTOHDWSCMLIG"){
+	if (btnAUTOHDWSCMLIG_BBELPN->Caption == "√ë AUTOHDWSCMLIG"){
 		CLP.WR( PC_HL_ERHBC_BBELPN_AUTOHDWSCMLIG, 1 );
 	}
 	else{
@@ -1680,7 +1680,7 @@ void __fastcall TfrmPrincipal::btnAUTOHDWSCMLIG_BBELPNClick(
 void __fastcall TfrmPrincipal::btnPRDEMERGSCMLI_BBELPNClick(
       TObject *Sender)
 {
-	if (btnPRDEMERGSCMLI_BBELPN->Caption == "— PRDEMERGSCMLI"){
+	if (btnPRDEMERGSCMLI_BBELPN->Caption == "√ë PRDEMERGSCMLI"){
 		CLP.WR( PC_HL_ERHBC_BBELPN_PRDEMERGSCMLI, 1 );
 	}
 	else{
@@ -1692,7 +1692,7 @@ void __fastcall TfrmPrincipal::btnPRDEMERGSCMLI_BBELPNClick(
 void __fastcall TfrmPrincipal::btnPRDEMERGSCMDE_BBELPNClick(
       TObject *Sender)
 {
-	if (btnPRDEMERGSCMDE_BBELPN->Caption == "— PRDEMERGSCMDE"){
+	if (btnPRDEMERGSCMDE_BBELPN->Caption == "√ë PRDEMERGSCMDE"){
 		CLP.WR( PC_HL_ERHBC_BBELPN_PRDEMERGSCMDE, 1 );
 	}
 	else{
@@ -1828,7 +1828,7 @@ void __fastcall TfrmPrincipal::btnEIXOBERPM_MODSBEClick(TObject *Sender)
 
 void __fastcall TfrmPrincipal::btnSSSK1_ACPLClick(TObject *Sender)
 {
-        if (btnSSSK1_ACPL->Caption == "N„o Acoplada"){
+        if (btnSSSK1_ACPL->Caption == "N√£o Acoplada"){
 		CLP.WR( PC_HL_ERPBC_SSSK1_ACPL, 1 );
 	}
 	else{
@@ -1839,7 +1839,7 @@ void __fastcall TfrmPrincipal::btnSSSK1_ACPLClick(TObject *Sender)
 
 void __fastcall TfrmPrincipal::btnSSSK1_DACPLClick(TObject *Sender)
 {
-        if (btnSSSK1_DACPL->Caption == "N„o Desacoplada"){
+        if (btnSSSK1_DACPL->Caption == "N√£o Desacoplada"){
 		CLP.WR( PC_HL_ERPBC_SSSK1_DACPL, 1 );
 	}
 	else{
@@ -1850,7 +1850,7 @@ void __fastcall TfrmPrincipal::btnSSSK1_DACPLClick(TObject *Sender)
 
 void __fastcall TfrmPrincipal::btnSSSK1_TRAVABERClick(TObject *Sender)
 {
-        if (btnSSSK1_TRAVABER->Caption == "Travada Aberta — OK"){
+        if (btnSSSK1_TRAVABER->Caption == "Travada Aberta √ë OK"){
 		CLP.WR( PC_HL_ERPBC_SSSK1_TRAVABER, 1 );
 	}
 	else{
@@ -1861,7 +1861,7 @@ void __fastcall TfrmPrincipal::btnSSSK1_TRAVABERClick(TObject *Sender)
 
 void __fastcall TfrmPrincipal::btnSSSK1_NTRAVABERClick(TObject *Sender)
 {
-        if (btnSSSK1_NTRAVABER->Caption == "N„o Trav. Aberta — OK"){
+        if (btnSSSK1_NTRAVABER->Caption == "N√£o Trav. Aberta √ë OK"){
 		CLP.WR( PC_HL_ERPBC_SSSK1_NTRAVABER, 1 );
 	}
 	else{
@@ -1872,7 +1872,7 @@ void __fastcall TfrmPrincipal::btnSSSK1_NTRAVABERClick(TObject *Sender)
 
 void __fastcall TfrmPrincipal::btnSSSK1_TRAVACPLClick(TObject *Sender)
 {
-        if (btnSSSK1_TRAVACPL->Caption == "N„o Travada"){
+        if (btnSSSK1_TRAVACPL->Caption == "N√£o Travada"){
 		CLP.WR( PC_HL_ERPBC_SSSK1_TRAVACPL, 1 );
 	}
 	else{
@@ -1883,7 +1883,7 @@ void __fastcall TfrmPrincipal::btnSSSK1_TRAVACPLClick(TObject *Sender)
 
 void __fastcall TfrmPrincipal::btnSSSK1_NTRAVACPLClick(TObject *Sender)
 {
-        if (btnSSSK1_NTRAVACPL->Caption == "N„o Destravada"){
+        if (btnSSSK1_NTRAVACPL->Caption == "N√£o Destravada"){
 		CLP.WR( PC_HL_ERPBC_SSSK1_NTRAVACPL, 1 );
 	}
 	else{
@@ -1894,7 +1894,7 @@ void __fastcall TfrmPrincipal::btnSSSK1_NTRAVACPLClick(TObject *Sender)
 
 void __fastcall TfrmPrincipal::btnSSSK2_ACPLClick(TObject *Sender)
 {
-        if (btnSSSK2_ACPL->Caption == "N„o Acoplada"){
+        if (btnSSSK2_ACPL->Caption == "N√£o Acoplada"){
 		CLP.WR( PC_HL_ERPBC_SSSK2_ACPL, 1 );
 	}
 	else{
@@ -1905,7 +1905,7 @@ void __fastcall TfrmPrincipal::btnSSSK2_ACPLClick(TObject *Sender)
 
 void __fastcall TfrmPrincipal::btnSSSK2_DACPLClick(TObject *Sender)
 {
-        if (btnSSSK2_DACPL->Caption == "N„o Desacoplada"){
+        if (btnSSSK2_DACPL->Caption == "N√£o Desacoplada"){
 		CLP.WR( PC_HL_ERPBC_SSSK2_DACPL, 1 );
 	}
 	else{
@@ -1916,7 +1916,7 @@ void __fastcall TfrmPrincipal::btnSSSK2_DACPLClick(TObject *Sender)
 
 void __fastcall TfrmPrincipal::btnSSSK2_TRAVABERClick(TObject *Sender)
 {
-        if (btnSSSK2_TRAVABER->Caption == "Travada Aberta — OK"){
+        if (btnSSSK2_TRAVABER->Caption == "Travada Aberta √ë OK"){
 		CLP.WR( PC_HL_ERPBC_SSSK2_TRAVABER, 1 );
 	}
 	else{
@@ -1927,7 +1927,7 @@ void __fastcall TfrmPrincipal::btnSSSK2_TRAVABERClick(TObject *Sender)
 
 void __fastcall TfrmPrincipal::btnSSSK2_NTRAVABERClick(TObject *Sender)
 {
-        if (btnSSSK2_NTRAVABER->Caption == "N„o Trav. Aberta — OK"){
+        if (btnSSSK2_NTRAVABER->Caption == "N√£o Trav. Aberta √ë OK"){
 		CLP.WR( PC_HL_ERPBC_SSSK2_NTRAVABER, 1 );
 	}
 	else{
@@ -1938,7 +1938,7 @@ void __fastcall TfrmPrincipal::btnSSSK2_NTRAVABERClick(TObject *Sender)
 
 void __fastcall TfrmPrincipal::btnSSSK2_TRAVACPLClick(TObject *Sender)
 {
-        if (btnSSSK2_TRAVACPL->Caption == "N„o Travada"){
+        if (btnSSSK2_TRAVACPL->Caption == "N√£o Travada"){
 		CLP.WR( PC_HL_ERPBC_SSSK2_TRAVACPL, 1 );
 	}
 	else{
@@ -1949,7 +1949,7 @@ void __fastcall TfrmPrincipal::btnSSSK2_TRAVACPLClick(TObject *Sender)
 
 void __fastcall TfrmPrincipal::btnSSSK2_NTRAVACPLClick(TObject *Sender)
 {
-        if (btnSSSK2_NTRAVACPL->Caption == "N„o Destravada"){
+        if (btnSSSK2_NTRAVACPL->Caption == "N√£o Destravada"){
 		CLP.WR( PC_HL_ERPBC_SSSK2_NTRAVACPL, 1 );
 	}
 	else{
@@ -1960,7 +1960,7 @@ void __fastcall TfrmPrincipal::btnSSSK2_NTRAVACPLClick(TObject *Sender)
 
 void __fastcall TfrmPrincipal::btnSSSK3_ACPLClick(TObject *Sender)
 {
-        if (btnSSSK3_ACPL->Caption == "N„o Acoplada"){
+        if (btnSSSK3_ACPL->Caption == "N√£o Acoplada"){
 		CLP.WR( PC_HL_ERSBB_SSSK3_ACPL, 1 );
 	}
 	else{
@@ -1971,7 +1971,7 @@ void __fastcall TfrmPrincipal::btnSSSK3_ACPLClick(TObject *Sender)
 
 void __fastcall TfrmPrincipal::btnSSSK3_DACPLClick(TObject *Sender)
 {
-        if (btnSSSK3_DACPL->Caption == "N„o Desacoplada"){
+        if (btnSSSK3_DACPL->Caption == "N√£o Desacoplada"){
 		CLP.WR( PC_HL_ERSBB_SSSK3_DACPL, 1 );
 	}
 	else{
@@ -1982,7 +1982,7 @@ void __fastcall TfrmPrincipal::btnSSSK3_DACPLClick(TObject *Sender)
 
 void __fastcall TfrmPrincipal::btnSSSK3_TRAVACPLClick(TObject *Sender)
 {
-        if (btnSSSK3_TRAVACPL->Caption == "N„o Travada"){
+        if (btnSSSK3_TRAVACPL->Caption == "N√£o Travada"){
 		CLP.WR( PC_HL_ERSBB_SSSK3_TRAVACPL, 1 );
 	}
 	else{
@@ -1993,7 +1993,7 @@ void __fastcall TfrmPrincipal::btnSSSK3_TRAVACPLClick(TObject *Sender)
 
 void __fastcall TfrmPrincipal::btnSSSK3_NTRAVACPLClick(TObject *Sender)
 {
-        if (btnSSSK3_NTRAVACPL->Caption == "N„o Destravada"){
+        if (btnSSSK3_NTRAVACPL->Caption == "N√£o Destravada"){
 		CLP.WR( PC_HL_ERSBB_SSSK3_NTRAVACPL, 1 );
 	}
 	else{
@@ -2015,7 +2015,7 @@ void __fastcall TfrmPrincipal::btnSSSK3_OLPBXClick(TObject *Sender)
 
 void __fastcall TfrmPrincipal::btnSSSK4_ACPLClick(TObject *Sender)
 {
-        if (btnSSSK4_ACPL->Caption == "N„o Acoplada"){
+        if (btnSSSK4_ACPL->Caption == "N√£o Acoplada"){
 		CLP.WR( PC_HL_ERSBE_SSSK4_ACPL, 1 );
 	}
 	else{
@@ -2026,7 +2026,7 @@ void __fastcall TfrmPrincipal::btnSSSK4_ACPLClick(TObject *Sender)
 
 void __fastcall TfrmPrincipal::btnSSSK4_DACPLClick(TObject *Sender)
 {
-        if (btnSSSK4_DACPL->Caption == "N„o Desacoplada"){
+        if (btnSSSK4_DACPL->Caption == "N√£o Desacoplada"){
 		CLP.WR( PC_HL_ERSBE_SSSK4_DACPL, 1 );
 	}
 	else{
@@ -2037,7 +2037,7 @@ void __fastcall TfrmPrincipal::btnSSSK4_DACPLClick(TObject *Sender)
 
 void __fastcall TfrmPrincipal::btnSSSK4_TRAVACPLClick(TObject *Sender)
 {
-        if (btnSSSK4_TRAVACPL->Caption == "N„o Travada"){
+        if (btnSSSK4_TRAVACPL->Caption == "N√£o Travada"){
 		CLP.WR( PC_HL_ERSBE_SSSK4_TRAVACPL, 1 );
 	}
 	else{
@@ -2048,7 +2048,7 @@ void __fastcall TfrmPrincipal::btnSSSK4_TRAVACPLClick(TObject *Sender)
 
 void __fastcall TfrmPrincipal::btnSSSK4_NTRAVACPLClick(TObject *Sender)
 {
-        if (btnSSSK4_NTRAVACPL->Caption == "N„o Destravada"){
+        if (btnSSSK4_NTRAVACPL->Caption == "N√£o Destravada"){
 		CLP.WR( PC_HL_ERSBE_SSSK4_NTRAVACPL, 1 );
 	}
 	else{
@@ -2301,12 +2301,12 @@ void __fastcall TfrmPrincipal::btnCtrlAutoTempClick(TObject *Sender)
                 ctrl_auto_temp_ol = false;
                 btnMODHID_TEMPOL->Enabled = true;
                 btnCtrlAutoTemp->Font->Color = clRed;
-                btnCtrlAutoTemp->Hint = "Controle Autom·tico da Temperatura do ”leo Lub. Inativa";
+                btnCtrlAutoTemp->Hint = "Controle Autom√°tico da Temperatura do √ìleo Lub. Inativa";
         }else{
                 ctrl_auto_temp_ol = true;
                 btnMODHID_TEMPOL->Enabled = false;
                 btnCtrlAutoTemp->Font->Color = clLime;
-                btnCtrlAutoTemp->Hint = "Controle Autom·tico da Temperatura do ”leo Lub. Ativa";
+                btnCtrlAutoTemp->Hint = "Controle Autom√°tico da Temperatura do √ìleo Lub. Ativa";
         }
 }
 //---------------------------------------------------------------------------
