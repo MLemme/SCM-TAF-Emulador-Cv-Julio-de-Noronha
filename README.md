@@ -1,4 +1,4 @@
-<h1>Sistema de Emulação ou Simulação de dados para Testes de Integração do SCM da Corveta Julío de Noronha</h1>
+<h1>Sistema de Emulação ou Simulação de dados para Testes de Integração do SCM da Corveta Julio de Noronha</h1>
 <h2> :shipit: Sobre</h2>
 <p>Projeto utilizado para os testes do SCM no âmbito da equipe de desenvolvimento para CLP e integrações com a IHM.<br>Desenvolvido no IPqM - Instituto de Pesquisas da Marinha, no GSD - Grupo de Sistemas Digitais, na divisão 142 - Automação e Controle.</p>
 <li>Utiliza comunicação através do protocolo ModBus para interface com um CLP do fabricante Schnneider Electric;</li>
